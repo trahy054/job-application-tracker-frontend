@@ -7,9 +7,9 @@ const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [form, setForm] = useState({ company: "", position: "", status: "" });
 
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ company: "", position: "", status: "" });
-  
+  const [updatingId, setUpdatingId] = useState(null);
+  const [updateForm, setUpdateForm] = useState({ company: "", position: "", status: "" });
+
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -35,20 +35,20 @@ const JobsPage = () => {
     setJobs(jobs.filter(job => job.id !== id));
   };
 
-  const startEditing = (job) => {
-    setEditingId(job.id);
-    setEditForm({ company: job.company, position: job.position, status: job.status });
+  const startUpdating = (job) => {
+    setUpdatingId(job.id);
+    setUpdateForm({ company: job.company, position: job.position, status: job.status });
   };
 
-  const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  const handleUpdateChange = (e) => {
+    setUpdateForm({ ...updateForm, [e.target.name]: e.target.value });
   };
 
-  const handleEditSubmit = async (e, id) => {
+  const handleUpdateSubmit = async (e, id) => {
     e.preventDefault();
-    const res = await axios.put(`http://localhost:5000/api/jobs/${id}`, editForm);
+    const res = await axios.put(`http://localhost:5000/api/jobs/${id}`, updateForm);
     setJobs(jobs.map(job => job.id === id ? res.data : job));
-    setEditingId(null);
+    setUpdatingId(null);
   };
 
   return (
@@ -82,33 +82,33 @@ const JobsPage = () => {
       <ul>
         {jobs.map(job => (
           <li key={job.id} style={{ marginBottom: "10px" }}>
-            {editingId === job.id ? (
-              // Inline edit form
-              <form onSubmit={(e) => handleEditSubmit(e, job.id)}>
+            {updatingId === job.id ? (
+              // Inline update form
+              <form onSubmit={(e) => handleUpdateSubmit(e, job.id)}>
                 <input
                   name="company"
-                  value={editForm.company}
-                  onChange={handleEditChange}
+                  value={updateForm.company}
+                  onChange={handleUpdateChange}
                   required
                 />
                 <input
                   name="position"
-                  value={editForm.position}
-                  onChange={handleEditChange}
+                  value={updateForm.position}
+                  onChange={handleUpdateChange}
                 />
                 <input
                   name="status"
-                  value={editForm.status}
-                  onChange={handleEditChange}
+                  value={updateForm.status}
+                  onChange={handleUpdateChange}
                   required
                 />
                 <button type="submit">Save</button>
-                <button type="button" onClick={() => setEditingId(null)}>Cancel</button>
+                <button type="button" onClick={() => setUpdatingId(null)}>Cancel</button>
               </form>
             ) : (
               <>
                 {job.company} - {job.position} - {job.status} {" "}
-                <button onClick={() => startEditing(job)}>Edit</button>
+                <button onClick={() => startUpdating(job)}>Update</button>
                 <button onClick={() => handleDelete(job.id)}>Delete</button>
               </>
             )}
