@@ -63,6 +63,34 @@ const JobsPage = () => {
   return (
     <div style={{ padding: "20px" }}>
       <h1>Job Application</h1>
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          placeholder="Search company or position"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <option value="">All Status</option>
+          <option value="Applied">Applied</option>
+          <option value="Interview">Interview</option>
+          <option value="Offer">Offer</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="id">Sort by Time</option>
+          <option value="company">Sort by Company</option>
+        </select>
+
+        <button onClick={fetchJobs}>Apply</button>
+      </div>
       <form onSubmit={handleSubmit}>
         <input
           name="company"
