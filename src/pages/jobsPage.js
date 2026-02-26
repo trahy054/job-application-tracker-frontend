@@ -10,12 +10,21 @@ const JobsPage = () => {
   const [updatingId, setUpdatingId] = useState(null);
   const [updateForm, setUpdateForm] = useState({ company: "", position: "", status: "" });
 
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [sortBy, setSortBy] = useState("id");
+
   useEffect(() => {
     fetchJobs();
   }, []);
 
   const fetchJobs = async () => {
-    const data = await getJobs();
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    if (filterStatus) params.append("status", filterStatus);
+    if (sortBy) params.append("sortBy", sortBy);
+
+    const { data } = await axios.get(`http://localhost:5000/api/jobs?${params.toString()}`);
     setJobs(data);
   };
 
