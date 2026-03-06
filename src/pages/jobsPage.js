@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getJobs, addJob } from '../services/jobService';
+import { addJob } from '../services/jobService';
 import axios from "axios";
 import "../App.css";
 
@@ -49,7 +49,7 @@ const JobsPage = () => {
     try {
       const { data } = await axios.get(`http://localhost:5000/api/jobs?${params.toString()}`);
       setJobs(data);
-      updateStats(data);  
+      updateStats(data);
     } catch (err) {
       console.error(err);
     }
@@ -67,7 +67,7 @@ const JobsPage = () => {
       const updatedJobs = [...jobs, newJob];
       setJobs(updatedJobs);
       setForm({ company: "", position: "", status: "" });
-      updateStats(updatedJobs);  
+      updateStats(updatedJobs);
     } catch (err) {
       console.error(err);
     }
@@ -79,7 +79,7 @@ const JobsPage = () => {
       await axios.delete(`http://localhost:5000/api/jobs/${id}`);
       const updatedJobs = jobs.filter(job => job._id !== id);
       setJobs(updatedJobs);
-      updateStats(updatedJobs);  
+      updateStats(updatedJobs);
     } catch (err) {
       console.error(err);
     }
@@ -103,7 +103,7 @@ const JobsPage = () => {
       const updatedJobs = jobs.map(job => job._id === id ? res.data : job);
       setJobs(updatedJobs);
       setUpdatingId(null);
-      updateStats(updatedJobs);  
+      updateStats(updatedJobs);
     } catch (err) {
       console.error(err);
     }
@@ -140,7 +140,18 @@ const JobsPage = () => {
       <form className="inline-form" onSubmit={handleSubmit}>
         <input name="company" placeholder="Company" value={form.company} onChange={handleChange} required />
         <input name="position" placeholder="Position" value={form.position} onChange={handleChange} />
-        <input name="status" placeholder="Status" value={form.status} onChange={handleChange} required />
+        <select
+          name="status"
+          value={form.status}
+          onChange={handleChange}
+          required
+        >
+          <option value="">All Status</option>
+          <option value="Applied">Applied</option>
+          <option value="Interview">Interview</option>
+          <option value="Offer">Offer</option>
+          <option value="Rejected">Rejected</option>
+        </select>
         <button type="submit" className="add-btn">Add Job</button>
       </form>
 
@@ -151,13 +162,30 @@ const JobsPage = () => {
               <form className="inline-form" onSubmit={(e) => handleUpdateSubmit(e, job._id)}>
                 <input name="company" value={updateForm.company} onChange={handleUpdateChange} required />
                 <input name="position" value={updateForm.position} onChange={handleUpdateChange} />
-                <input name="status" value={updateForm.status} onChange={handleUpdateChange} required />
+                <select
+                  name="status"
+                  value={updateForm.status}
+                  onChange={handleUpdateChange}
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="Applied">Applied</option>
+                  <option value="Interview">Interview</option>
+                  <option value="Offer">Offer</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
                 <button type="submit" className="add-btn">Save</button>
                 <button type="button" onClick={() => setUpdatingId(null)} className="cancel-btn">Cancel</button>
               </form>
             ) : (
               <>
-                <span>{job.company} - {job.position} - {job.status}</span>
+                <>
+                  <span>{job.company}</span>
+                  <span>{job.position}</span>
+                  <span className={`status-badge status-${job.status.toLowerCase()}`}>
+                    {job.status}
+                  </span>
+                </>
                 <div>
                   <button onClick={() => startUpdating(job)} className="update-btn">Update</button>
                   <button onClick={() => handleDelete(job._id)} className="delete-btn">Delete</button>
