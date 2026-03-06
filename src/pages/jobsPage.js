@@ -14,36 +14,78 @@ const JobsPage = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [sortBy, setSortBy] = useState("id");
 
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    applied: 0,
+    interview: 0,
+    offer: 0,
+    rejected: 0
+  });
+
+  // Helper function to update stats based on current jobs array
+  const updateStats = (jobsArray) => {
+    const newStats = {
+      totalJobs: jobsArray.length,
+      applied: jobsArray.filter(j => j.status === "Applied").length,
+      interview: jobsArray.filter(j => j.status === "Interview").length,
+      offer: jobsArray.filter(j => j.status === "Offer").length,
+      rejected: jobsArray.filter(j => j.status === "Rejected").length,
+    };
+
+    setStats(newStats);
+  };
+
   useEffect(() => {
     fetchJobs();
   }, []);
 
+  // Fetch jobs with current filters and sorting
   const fetchJobs = async () => {
     const params = new URLSearchParams();
     if (search) params.append("search", search);
     if (filterStatus) params.append("status", filterStatus);
     if (sortBy) params.append("sortBy", sortBy);
 
-    const { data } = await axios.get(`http://localhost:5000/api/jobs?${params.toString()}`);
-    setJobs(data);
+    try {
+      const { data } = await axios.get(`http://localhost:5000/api/jobs?${params.toString()}`);
+      setJobs(data);
+      updateStats(data);  
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission to add a new job
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newJob = await addJob(form);
-    setJobs([...jobs, newJob]);
-    setForm({ company: "", position: "", status: "" });
+    try {
+      const newJob = await addJob(form);
+      const updatedJobs = [...jobs, newJob];
+      setJobs(updatedJobs);
+      setForm({ company: "", position: "", status: "" });
+      updateStats(updatedJobs);  
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+  // Handle job deletion
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/jobs/${id}`);
-    setJobs(jobs.filter(job => job._id !== id));
+    try {
+      await axios.delete(`http://localhost:5000/api/jobs/${id}`);
+      const updatedJobs = jobs.filter(job => job._id !== id);
+      setJobs(updatedJobs);
+      updateStats(updatedJobs);  
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+  // Start updating a job
   const startUpdating = (job) => {
     setUpdatingId(job._id);
     setUpdateForm({ company: job.company, position: job.position, status: job.status });
@@ -53,15 +95,30 @@ const JobsPage = () => {
     setUpdateForm({ ...updateForm, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission to update a job
   const handleUpdateSubmit = async (e, id) => {
     e.preventDefault();
-    const res = await axios.put(`http://localhost:5000/api/jobs/${id}`, updateForm);
-    setJobs(jobs.map(job => job._id === id ? res.data : job));
-    setUpdatingId(null);
+    try {
+      const res = await axios.put(`http://localhost:5000/api/jobs/${id}`, updateForm);
+      const updatedJobs = jobs.map(job => job._id === id ? res.data : job);
+      setJobs(updatedJobs);
+      setUpdatingId(null);
+      updateStats(updatedJobs);  
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="container">
+      <div className="stats-container">
+        <div className="stat-card">Total Jobs: {stats.totalJobs}</div>
+        <div className="stat-card">Applied: {stats.applied}</div>
+        <div className="stat-card">Interview: {stats.interview}</div>
+        <div className="stat-card">Offer: {stats.offer}</div>
+        <div className="stat-card">Rejected: {stats.rejected}</div>
+      </div>
+
       <h1 className="title">Job Tracker</h1>
 
       <div className="filter-section">
