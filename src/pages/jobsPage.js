@@ -22,6 +22,17 @@ const JobsPage = () => {
     rejected: 0
   });
 
+  // Toast notification state and function
+  const [toast, setToast] = useState({ message: "", type: "" });
+  const [showToastFlag, setShowToastFlag] = useState(false);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setShowToastFlag(true);
+    setTimeout(() => setShowToastFlag(false), 3000);
+  };
+
+
   // Helper function to update stats based on current jobs array
   const updateStats = (jobsArray) => {
     const newStats = {
@@ -68,8 +79,11 @@ const JobsPage = () => {
       setJobs(updatedJobs);
       setForm({ company: "", position: "", status: "" });
       updateStats(updatedJobs);
+      showToast("Job added successfully!", "success");
+
     } catch (err) {
       console.error(err);
+      showToast("Failed to add job", "error");
     }
   };
 
@@ -80,8 +94,12 @@ const JobsPage = () => {
       const updatedJobs = jobs.filter(job => job._id !== id);
       setJobs(updatedJobs);
       updateStats(updatedJobs);
+      showToast("Job deleted successfully!", "success");
+
     } catch (err) {
       console.error(err);
+      showToast("Failed to delete job", "error");
+
     }
   };
 
@@ -104,98 +122,96 @@ const JobsPage = () => {
       setJobs(updatedJobs);
       setUpdatingId(null);
       updateStats(updatedJobs);
+      showToast("Job updated successfully!", "success");
     } catch (err) {
       console.error(err);
+      showToast("Failed to update job", "error");
     }
   };
 
   return (
-    <div className="container">
-      <div className="stats-container">
-        <div className="stat-card">Total Jobs: {stats.totalJobs}</div>
-        <div className="stat-card">Applied: {stats.applied}</div>
-        <div className="stat-card">Interview: {stats.interview}</div>
-        <div className="stat-card">Offer: {stats.offer}</div>
-        <div className="stat-card">Rejected: {stats.rejected}</div>
-      </div>
+    <>
+      {showToastFlag && (
+        <div className={`toast ${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
 
-      <h1 className="title">Job Tracker</h1>
+      <div className="container">
+        <div className="stats-container">
+          <div className="stat-card">Total Jobs: {stats.totalJobs}</div>
+          <div className="stat-card">Applied: {stats.applied}</div>
+          <div className="stat-card">Interview: {stats.interview}</div>
+          <div className="stat-card">Offer: {stats.offer}</div>
+          <div className="stat-card">Rejected: {stats.rejected}</div>
+        </div>
 
-      <div className="filter-section">
-        <input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-          <option value="">All Status</option>
-          <option value="Applied">Applied</option>
-          <option value="Interview">Interview</option>
-          <option value="Offer">Offer</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-          <option value="id">Sort by Time</option>
-          <option value="company">Sort by Company</option>
-        </select>
-        <button onClick={fetchJobs}>Apply</button>
-      </div>
+        <h1 className="title">Job Tracker</h1>
 
-      <form className="inline-form" onSubmit={handleSubmit}>
-        <input name="company" placeholder="Company" value={form.company} onChange={handleChange} required />
-        <input name="position" placeholder="Position" value={form.position} onChange={handleChange} />
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-          required
-        >
-          <option value="">All Status</option>
-          <option value="Applied">Applied</option>
-          <option value="Interview">Interview</option>
-          <option value="Offer">Offer</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-        <button type="submit" className="add-btn">Add Job</button>
-      </form>
+        <div className="filter-section">
+          <input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+            <option value="">All Status</option>
+            <option value="Applied">Applied</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+            <option value="id">Sort by Time</option>
+            <option value="company">Sort by Company</option>
+          </select>
+          <button onClick={fetchJobs}>Apply</button>
+        </div>
 
-      <ul className="job-list">
-        {jobs.map(job => (
-          <li key={job._id} className="job-item">
-            {updatingId === job._id ? (
-              <form className="inline-form" onSubmit={(e) => handleUpdateSubmit(e, job._id)}>
-                <input name="company" value={updateForm.company} onChange={handleUpdateChange} required />
-                <input name="position" value={updateForm.position} onChange={handleUpdateChange} />
-                <select
-                  name="status"
-                  value={updateForm.status}
-                  onChange={handleUpdateChange}
-                  required
-                >
-                  <option value="">Select Status</option>
-                  <option value="Applied">Applied</option>
-                  <option value="Interview">Interview</option>
-                  <option value="Offer">Offer</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-                <button type="submit" className="add-btn">Save</button>
-                <button type="button" onClick={() => setUpdatingId(null)} className="cancel-btn">Cancel</button>
-              </form>
-            ) : (
-              <>
+        <form className="inline-form" onSubmit={handleSubmit}>
+          <input name="company" placeholder="Company" value={form.company} onChange={handleChange} required />
+          <input name="position" placeholder="Position" value={form.position} onChange={handleChange} />
+          <select name="status" value={form.status} onChange={handleChange} required>
+            <option value="">All Status</option>
+            <option value="Applied">Applied</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <button type="submit" className="add-btn">Add Job</button>
+        </form>
+
+        <ul className="job-list">
+          {jobs.map(job => (
+            <li key={job._id} className="job-item">
+              {updatingId === job._id ? (
+                <form className="inline-form" onSubmit={(e) => handleUpdateSubmit(e, job._id)}>
+                  <input name="company" value={updateForm.company} onChange={handleUpdateChange} required />
+                  <input name="position" value={updateForm.position} onChange={handleUpdateChange} />
+                  <select name="status" value={updateForm.status} onChange={handleUpdateChange} required>
+                    <option value="">Select Status</option>
+                    <option value="Applied">Applied</option>
+                    <option value="Interview">Interview</option>
+                    <option value="Offer">Offer</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                  <button type="submit" className="add-btn">Save</button>
+                  <button type="button" onClick={() => setUpdatingId(null)} className="cancel-btn">Cancel</button>
+                </form>
+              ) : (
                 <>
                   <span>{job.company}</span>
                   <span>{job.position}</span>
                   <span className={`status-badge status-${job.status.toLowerCase()}`}>
                     {job.status}
                   </span>
+                  <div>
+                    <button onClick={() => startUpdating(job)} className="update-btn">Update</button>
+                    <button onClick={() => handleDelete(job._id)} className="delete-btn">Delete</button>
+                  </div>
                 </>
-                <div>
-                  <button onClick={() => startUpdating(job)} className="update-btn">Update</button>
-                  <button onClick={() => handleDelete(job._id)} className="delete-btn">Delete</button>
-                </div>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
   );
 };
 
