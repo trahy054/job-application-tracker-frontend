@@ -36,3 +36,94 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* Container */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Title */
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+/* Filter Section */
+.filter-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+/* Inputs and Selects */
+input, select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+}
+
+/* Buttons */
+button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #4f46e5;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Job List */
+.job-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.job-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.job-item > div {
+  display: flex;
+  gap: 8px; 
+}
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: center;
+}
+
+
+/* Add/Update/Delete button colors */
+.add-btn { background-color: #10b981; }
+.cancel-btn { background-color: #d1d5db; color: #000; }
+.update-btn { background-color: #facc15; color: #000; }
+.delete-btn { background-color: #ef4444; }

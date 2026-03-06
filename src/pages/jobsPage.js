@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getJobs, addJob } from '../services/jobService';
 import axios from "axios";
-
+import "../App.css";
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -41,11 +41,11 @@ const JobsPage = () => {
 
   const handleDelete = async (id) => {
     await axios.delete(`http://localhost:5000/api/jobs/${id}`);
-    setJobs(jobs.filter(job => job.id !== id));
+    setJobs(jobs.filter(job => job._id !== id));
   };
 
   const startUpdating = (job) => {
-    setUpdatingId(job.id);
+    setUpdatingId(job._id);
     setUpdateForm({ company: job.company, position: job.position, status: job.status });
   };
 
@@ -56,97 +56,55 @@ const JobsPage = () => {
   const handleUpdateSubmit = async (e, id) => {
     e.preventDefault();
     const res = await axios.put(`http://localhost:5000/api/jobs/${id}`, updateForm);
-    setJobs(jobs.map(job => job.id === id ? res.data : job));
+    setJobs(jobs.map(job => job._id === id ? res.data : job));
     setUpdatingId(null);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Job Application</h1>
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          placeholder="Search company or position"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+    <div className="container">
+      <h1 className="title">Job Tracker</h1>
 
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
+      <div className="filter-section">
+        <input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Status</option>
           <option value="Applied">Applied</option>
           <option value="Interview">Interview</option>
           <option value="Offer">Offer</option>
           <option value="Rejected">Rejected</option>
         </select>
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
+        <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="id">Sort by Time</option>
           <option value="company">Sort by Company</option>
         </select>
-
         <button onClick={fetchJobs}>Apply</button>
       </div>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="company"
-          placeholder="Company"
-          value={form.company}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="position"
-          placeholder="Position"
-          value={form.position}
-          onChange={handleChange}
-        />
-        <input
-          name="status"
-          placeholder="Status"
-          value={form.status}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Add Job</button>
+
+      <form className="inline-form" onSubmit={handleSubmit}>
+        <input name="company" placeholder="Company" value={form.company} onChange={handleChange} required />
+        <input name="position" placeholder="Position" value={form.position} onChange={handleChange} />
+        <input name="status" placeholder="Status" value={form.status} onChange={handleChange} required />
+        <button type="submit" className="add-btn">Add Job</button>
       </form>
 
-
-      <ul>
+      <ul className="job-list">
         {jobs.map(job => (
-          <li key={job.id} style={{ marginBottom: "10px" }}>
-            {updatingId === job.id ? (
-              // Inline update form
-              <form onSubmit={(e) => handleUpdateSubmit(e, job.id)}>
-                <input
-                  name="company"
-                  value={updateForm.company}
-                  onChange={handleUpdateChange}
-                  required
-                />
-                <input
-                  name="position"
-                  value={updateForm.position}
-                  onChange={handleUpdateChange}
-                />
-                <input
-                  name="status"
-                  value={updateForm.status}
-                  onChange={handleUpdateChange}
-                  required
-                />
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => setUpdatingId(null)}>Cancel</button>
+          <li key={job._id} className="job-item">
+            {updatingId === job._id ? (
+              <form className="inline-form" onSubmit={(e) => handleUpdateSubmit(e, job._id)}>
+                <input name="company" value={updateForm.company} onChange={handleUpdateChange} required />
+                <input name="position" value={updateForm.position} onChange={handleUpdateChange} />
+                <input name="status" value={updateForm.status} onChange={handleUpdateChange} required />
+                <button type="submit" className="add-btn">Save</button>
+                <button type="button" onClick={() => setUpdatingId(null)} className="cancel-btn">Cancel</button>
               </form>
             ) : (
               <>
-                {job.company} - {job.position} - {job.status} {" "}
-                <button onClick={() => startUpdating(job)}>Update</button>
-                <button onClick={() => handleDelete(job.id)}>Delete</button>
+                <span>{job.company} - {job.position} - {job.status}</span>
+                <div>
+                  <button onClick={() => startUpdating(job)} className="update-btn">Update</button>
+                  <button onClick={() => handleDelete(job._id)} className="delete-btn">Delete</button>
+                </div>
               </>
             )}
           </li>
@@ -154,5 +112,6 @@ const JobsPage = () => {
       </ul>
     </div>
   );
-}
+};
+
 export default JobsPage;
